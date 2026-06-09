@@ -560,12 +560,6 @@
     </div>
   </div>
 
-  <div class="typing-indicator" id="typing">
-    <div class="typing-dots">
-      <span></span><span></span><span></span>
-    </div>
-  </div>
-
   <div class="input-area">
     <textarea id="message-input" placeholder="Type a message…" rows="1"></textarea>
     <button class="send-btn" id="send-btn" aria-label="Send">
@@ -785,16 +779,17 @@ function addError(text) {
 function setLoading(state) {
   isLoading = state;
   document.getElementById('send-btn').disabled = state;
-  const typingEl = document.getElementById('typing');
   const container = document.getElementById('messages');
   if (state) {
-    typingEl.className = 'typing-indicator visible';
-    container.appendChild(typingEl);
+    const el = document.createElement('div');
+    el.id = 'typing';
+    el.className = 'typing-indicator visible';
+    el.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
+    container.appendChild(el);
     container.scrollTop = container.scrollHeight;
   } else {
-    typingEl.className = 'typing-indicator';
-    // move typing indicator back outside messages so renderMessages doesn't destroy it
-    document.body.appendChild(typingEl);
+    const el = document.getElementById('typing');
+    if (el) el.remove();
   }
 }
 
