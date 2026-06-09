@@ -535,13 +535,6 @@
       <input type="text" id="companion-name" placeholder="e.g. Lena, Mirror, or leave blank" maxlength="40">
     </div>
 
-    <!-- Host API key (hidden by default, shown if no env key) -->
-    <div class="field-group" id="key-field" style="display:none;">
-      <label class="field-label" for="api-key">API key</label>
-      <p class="field-hint">Provided by your workshop host.</p>
-      <input type="password" id="api-key" placeholder="sk-ant-...">
-    </div>
-
     <button class="btn-primary" id="start-btn">Start the conversation →</button>
   </div>
 </div>
@@ -614,21 +607,11 @@ const PRESETS = {
 let systemPrompt = '';
 let companionName = 'Companion';
 let messages = [];
-let apiKey = '';
 let isLoading = false;
-
-// ── HOST CONFIG ──────────────────────────────────────────────
-// To deploy: paste your Anthropic API key here.
-// Students will not see this key — it lives in the source.
-// Leave empty to show a key input field on the setup screen.
-const HOST_API_KEY = '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';
+// API key lives in Vercel environment variable ANTHROPIC_KEY — not here
 
 // ── INIT ─────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
-  if (!HOST_API_KEY) {
-    document.getElementById('key-field').style.display = 'block';
-  }
-
   // Preset buttons
   document.querySelectorAll('.preset-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -700,12 +683,6 @@ function startChat() {
   }
 
   companionName = document.getElementById('companion-name').value.trim() || 'Companion';
-  apiKey = HOST_API_KEY || document.getElementById('api-key').value.trim();
-
-  if (!apiKey) {
-    alert('No API key found. Ask your workshop host for the key.');
-    return;
-  }
 
   document.getElementById('header-name').textContent = companionName;
   document.getElementById('setup-screen').style.display = 'none';
@@ -728,13 +705,12 @@ async function sendMessage() {
   setLoading(true);
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const response = await fetch('/api/chat', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
+        
+        
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
