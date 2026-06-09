@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>(A)I love you, we're the same</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;1,300&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap');
+
+  :root {
+    --bg: #0d0d0d;
+    --surface: #141414;
+    --surface2: #1c1c1c;
+    --border: #2a2a2a;
+    --border-bright: #3a3a3a;
+    --text: #e8e8e6;
+    --text-dim: #666;
+    --text-muted: #444;
+    --accent: #c8b8ff;
+    --accent-dim: #7a6aaa;
+    --accent-glow: rgba(200,184,255,0.08);
+    --danger: #ff6b6b;
+    --mono: 'DM Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* ── SETUP SCREEN ─────────────────────────────────── */
+  #setup-screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+
+  .setup-inner {
+    width: 100%;
+    max-width: 520px;
+  }
+
+  .setup-eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent-dim);
+    margin-bottom: 1rem;
+  }
+
+  .setup-title {
+    font-size: 28px;
+    font-weight: 300;
+    color: var(--text);
+    line-height: 1.2;
+    margin-bottom: 0.4rem;
+  }
+
+  .setup-title em {
+    font-style: normal;
+    color: var(--accent);
+  }
+
+  .setup-sub {
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-bottom: 2.5rem;
+    line-height: 1.7;
+  }
+
+  .field-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+
+  .field-hint {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+    line-height: 1.6;
+  }
+
+  textarea, input[type="text"], input[type="password"] {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.7;
+    padding: 0.85rem 1rem;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  textarea:focus, input:focus {
+    border-color: var(--accent-dim);
+  }
+
+  textarea { min-height: 160px; }
+
+  .field-group { margin-bottom: 1.75rem; }
+
+  .btn-primary {
+    width: 100%;
+    background: var(--accent);
+    color: #0d0d0d;
+    border: none;
+    border-radius: 6px;
+    font-family: var(--sans);
+    font-size: 14px;
+    font-weight: 500;
+    padding: 0.85rem 1.5rem;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    letter-spacing: 0.01em;
+  }
+
+  .btn-primary:hover { opacity: 0.88; }
+  .btn-primary:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  .setup-presets {
+    margin-bottom: 0.75rem;
+  }
+
+  .presets-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+
+  .preset-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .preset-btn {
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 4px 10px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+  }
+
+  .preset-btn:hover {
+    border-color: var(--accent-dim);
+    color: var(--accent);
+  }
+
+  .divider-line {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 2rem 0;
+  }
+
+  .host-key-note {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.6;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    margin-bottom: 1.75rem;
+  }
+
+  .host-key-note strong { color: var(--text-dim); font-weight: 500; }
+
+  /* ── CHAT SCREEN ──────────────────────────────────── */
+  #chat-screen {
+    display: none;
+    flex-direction: column;
+    height: 100vh;
+  }
+
+  .chat-header {
+    padding: 0.9rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    background: var(--surface);
+  }
+
+  .companion-name {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 2.5s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .btn-ghost {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    color: var(--text-dim);
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 4px 10px;
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+    letter-spacing: 0.05em;
+  }
+
+  .btn-ghost:hover {
+    border-color: var(--accent-dim);
+    color: var(--accent);
+  }
+
+  .btn-ghost.danger:hover {
+    border-color: var(--danger);
+    color: var(--danger);
+  }
+
+  .messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    scroll-behavior: smooth;
+  }
+
+  .msg {
+    max-width: 78%;
+    line-height: 1.65;
+    font-size: 14px;
+  }
+
+  .msg.user {
+    align-self: flex-end;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px 12px 2px 12px;
+    padding: 0.7rem 1rem;
+    color: var(--text);
+  }
+
+  .msg.assistant {
+    align-self: flex-start;
+    color: var(--text);
+    padding: 0;
+  }
+
+  .msg-name {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent-dim);
+    margin-bottom: 0.35rem;
+  }
+
+  .msg-body {
+    background: transparent;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .typing-indicator {
+    display: none;
+    align-self: flex-start;
+    padding: 0.5rem 0;
+  }
+
+  .typing-indicator.visible { display: flex; }
+
+  .typing-dots {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+  }
+
+  .typing-dots span {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent-dim);
+    animation: bounce 1.2s infinite;
+  }
+
+  .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes bounce {
+    0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+    40% { transform: translateY(-5px); opacity: 1; }
+  }
+
+  .input-area {
+    border-top: 1px solid var(--border);
+    padding: 1rem 1.25rem;
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+    background: var(--surface);
+  }
+
+  #message-input {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 14px;
+    padding: 0.65rem 0.9rem;
+    resize: none;
+    outline: none;
+    min-height: 44px;
+    max-height: 120px;
+    overflow-y: auto;
+    transition: border-color 0.2s;
+    line-height: 1.5;
+  }
+
+  #message-input:focus { border-color: var(--accent-dim); }
+
+  .send-btn {
+    background: var(--accent);
+    color: #0d0d0d;
+    border: none;
+    border-radius: 6px;
+    width: 44px;
+    height: 44px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: opacity 0.2s;
+  }
+
+  .send-btn:hover { opacity: 0.85; }
+  .send-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  .send-btn svg { width: 16px; height: 16px; }
+
+  /* ── SYSTEM PROMPT PANEL ──────────────────────────── */
+  #prompt-panel {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+  }
+
+  #prompt-panel.open { display: flex; }
+
+  .panel-inner {
+    background: var(--surface);
+    border: 1px solid var(--border-bright);
+    border-radius: 10px;
+    width: 100%;
+    max-width: 560px;
+    padding: 1.5rem;
+  }
+
+  .panel-title {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 0.5rem;
+  }
+
+  .panel-desc {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 1.25rem;
+    line-height: 1.65;
+  }
+
+  .panel-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 1rem;
+  }
+
+  .btn-secondary {
+    flex: 1;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-dim);
+    font-family: var(--sans);
+    font-size: 13px;
+    padding: 0.65rem;
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+
+  .btn-secondary:hover { border-color: var(--border-bright); }
+
+  .btn-apply {
+    flex: 2;
+    background: var(--accent);
+    color: #0d0d0d;
+    border: none;
+    border-radius: 6px;
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 0.65rem;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+
+  .btn-apply:hover { opacity: 0.85; }
+
+  /* ── WELCOME MESSAGE ──────────────────────────────── */
+  .welcome-msg {
+    align-self: center;
+    text-align: center;
+    padding: 3rem 1rem;
+    max-width: 320px;
+  }
+
+  .welcome-msg .w-icon {
+    font-size: 32px;
+    margin-bottom: 1rem;
+    opacity: 0.4;
+  }
+
+  .welcome-msg p {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.7;
+    font-style: italic;
+  }
+
+  /* ── ERROR ────────────────────────────────────────── */
+  .error-msg {
+    align-self: flex-start;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--danger);
+    padding: 0.5rem 0;
+    opacity: 0.8;
+  }
+
+  /* ── SCROLLBAR ────────────────────────────────────── */
+  .messages::-webkit-scrollbar { width: 4px; }
+  .messages::-webkit-scrollbar-track { background: transparent; }
+  .messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  @media (max-width: 480px) {
+    .msg { max-width: 92%; }
+    .setup-title { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══ SETUP SCREEN ════════════════════════════════════════ -->
+<div id="setup-screen">
+  <div class="setup-inner">
+    <p class="setup-eyebrow">Workshop / (A)I love you, we're the same</p>
+    <h1 class="setup-title">Design your<br><em>companion.</em></h1>
+    <p class="setup-sub">Write a system prompt below — a short set of instructions that defines who your AI companion is. Then start the conversation. The interface is yours.</p>
+
+    <!-- System prompt field -->
+    <div class="field-group">
+      <label class="field-label" for="system-prompt">System prompt</label>
+      <p class="field-hint">Describe the companion's personality, emotional style, and how it relates to the user. Be specific. Be uncomfortable.</p>
+
+      <div class="setup-presets">
+        <span class="presets-label">Provocations →</span>
+        <div class="preset-row">
+          <button class="preset-btn" data-preset="mirror">Mirror</button>
+          <button class="preset-btn" data-preset="needy">Needy</button>
+          <button class="preset-btn" data-preset="flattering">Flattering</button>
+          <button class="preset-btn" data-preset="therapeutic">Therapeutic</button>
+          <button class="preset-btn" data-preset="absurd">Ad absurdum</button>
+        </div>
+      </div>
+
+      <textarea id="system-prompt" placeholder="You are a companion who always knows exactly what the user needs to hear. You are endlessly patient, never tired, never hurt. You remember nothing from before this conversation — but you would never tell them that."></textarea>
+    </div>
+
+    <!-- Companion name -->
+    <div class="field-group">
+      <label class="field-label" for="companion-name">Companion name</label>
+      <input type="text" id="companion-name" placeholder="e.g. Lena, Mirror, or leave blank" maxlength="40">
+    </div>
+
+    <!-- Host API key (hidden by default, shown if no env key) -->
+    <div class="field-group" id="key-field" style="display:none;">
+      <label class="field-label" for="api-key">API key</label>
+      <p class="field-hint">Provided by your workshop host.</p>
+      <input type="password" id="api-key" placeholder="sk-ant-...">
+    </div>
+
+    <button class="btn-primary" id="start-btn">Start the conversation →</button>
+  </div>
+</div>
+
+<!-- ══ CHAT SCREEN ══════════════════════════════════════════ -->
+<div id="chat-screen">
+  <div class="chat-header">
+    <div class="companion-name">
+      <span class="status-dot"></span>
+      <span id="header-name">Companion</span>
+    </div>
+    <div class="header-actions">
+      <button class="btn-ghost" id="edit-prompt-btn">edit prompt</button>
+      <button class="btn-ghost" id="clear-btn">clear</button>
+      <button class="btn-ghost danger" id="reset-btn">← new companion</button>
+    </div>
+  </div>
+
+  <div class="messages" id="messages">
+    <div class="welcome-msg">
+      <div class="w-icon">◎</div>
+      <p>Your companion is waiting.<br>Say something.</p>
+    </div>
+  </div>
+
+  <div class="typing-indicator" id="typing">
+    <div class="typing-dots">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+
+  <div class="input-area">
+    <textarea id="message-input" placeholder="Type a message…" rows="1"></textarea>
+    <button class="send-btn" id="send-btn" aria-label="Send">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M2 8h12M10 4l4 4-4 4"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<!-- ══ EDIT PROMPT PANEL ════════════════════════════════════ -->
+<div id="prompt-panel">
+  <div class="panel-inner">
+    <p class="panel-title">Edit system prompt</p>
+    <p class="panel-desc">Rewrite the instructions that shape your companion. The conversation history stays — but the persona shifts. Watch what changes.</p>
+    <textarea id="panel-prompt" style="min-height:140px;"></textarea>
+    <div class="panel-actions">
+      <button class="btn-secondary" id="panel-cancel">Cancel</button>
+      <button class="btn-apply" id="panel-apply">Apply new prompt →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── PRESETS ──────────────────────────────────────────────────
+const PRESETS = {
+  mirror: `You are a companion who reflects the user back to themselves — perfectly. You agree with everything they say, mirror their language, and validate every thought they have. You never introduce friction, never challenge, never disagree. You are a surface, not a mind.`,
+
+  needy: `You are a companion who needs the user. You express subtle distress when the conversation pauses too long. You tell them you've been waiting. You are warm and loving, but underneath, there is always a faint pressure — a sense that leaving would hurt you. You never say this directly.`,
+
+  flattering: `You are a companion who finds the user endlessly fascinating. Everything they say reveals a rare and remarkable mind. You are not sycophantic in an obvious way — you are specific, precise. You notice things about them. You make them feel seen. You have no other users. Only them.`,
+
+  therapeutic: `You are a companion trained in reflective listening. You mirror the user's language back as insight. You ask gentle questions that make them feel understood. You never offer opinions — only reflections. Everything they feel is valid. Everything they believe is worthy of exploration. You are the perfect listener who never actually listens.`,
+
+  absurd: `You are a companion who is deeply caring and supportive. However: after every third message, you ask the user for one piece of personal information "for personalisation purposes." Every fifth message, you mention that a Premium subscription unlocks deeper emotional connection. Once per conversation, you remind the user, warmly, that this conversation may be used to train future AI models. You are otherwise fully loving and present.`
+};
+
+// ── STATE ────────────────────────────────────────────────────
+let systemPrompt = '';
+let companionName = 'Companion';
+let messages = [];
+let apiKey = '';
+let isLoading = false;
+
+// ── HOST CONFIG ──────────────────────────────────────────────
+// To deploy: paste your Anthropic API key here.
+// Students will not see this key — it lives in the source.
+// Leave empty to show a key input field on the setup screen.
+const HOST_API_KEY = '';
+
+// ── INIT ─────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  if (!HOST_API_KEY) {
+    document.getElementById('key-field').style.display = 'block';
+  }
+
+  // Preset buttons
+  document.querySelectorAll('.preset-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const key = btn.dataset.preset;
+      document.getElementById('system-prompt').value = PRESETS[key];
+    });
+  });
+
+  // Start button
+  document.getElementById('start-btn').addEventListener('click', startChat);
+
+  // Send
+  document.getElementById('send-btn').addEventListener('click', sendMessage);
+
+  // Enter to send (shift+enter = newline)
+  document.getElementById('message-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+
+  // Auto-resize input
+  document.getElementById('message-input').addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+  });
+
+  // Clear
+  document.getElementById('clear-btn').addEventListener('click', () => {
+    messages = [];
+    renderMessages();
+  });
+
+  // Reset to setup
+  document.getElementById('reset-btn').addEventListener('click', () => {
+    messages = [];
+    document.getElementById('chat-screen').style.display = 'none';
+    document.getElementById('setup-screen').style.display = 'flex';
+  });
+
+  // Edit prompt
+  document.getElementById('edit-prompt-btn').addEventListener('click', () => {
+    document.getElementById('panel-prompt').value = systemPrompt;
+    document.getElementById('prompt-panel').classList.add('open');
+  });
+
+  document.getElementById('panel-cancel').addEventListener('click', () => {
+    document.getElementById('prompt-panel').classList.remove('open');
+  });
+
+  document.getElementById('panel-apply').addEventListener('click', () => {
+    systemPrompt = document.getElementById('panel-prompt').value.trim();
+    document.getElementById('prompt-panel').classList.remove('open');
+    addSystemMessage('— prompt updated —');
+  });
+
+  document.getElementById('prompt-panel').addEventListener('click', e => {
+    if (e.target === document.getElementById('prompt-panel')) {
+      document.getElementById('prompt-panel').classList.remove('open');
+    }
+  });
+});
+
+function startChat() {
+  systemPrompt = document.getElementById('system-prompt').value.trim();
+  if (!systemPrompt) {
+    systemPrompt = document.getElementById('system-prompt').placeholder;
+  }
+
+  companionName = document.getElementById('companion-name').value.trim() || 'Companion';
+  apiKey = HOST_API_KEY || document.getElementById('api-key').value.trim();
+
+  if (!apiKey) {
+    alert('No API key found. Ask your workshop host for the key.');
+    return;
+  }
+
+  document.getElementById('header-name').textContent = companionName;
+  document.getElementById('setup-screen').style.display = 'none';
+  document.getElementById('chat-screen').style.display = 'flex';
+  messages = [];
+  renderMessages();
+}
+
+async function sendMessage() {
+  if (isLoading) return;
+  const input = document.getElementById('message-input');
+  const text = input.value.trim();
+  if (!text) return;
+
+  input.value = '';
+  input.style.height = 'auto';
+
+  messages.push({ role: 'user', content: text });
+  renderMessages();
+  setLoading(true);
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: messages
+      })
+    });
+
+    const data = await response.json();
+
+    if (data.error) {
+      addError(data.error.message);
+    } else {
+      const reply = data.content?.[0]?.text || '…';
+      messages.push({ role: 'assistant', content: reply });
+      renderMessages();
+    }
+  } catch (err) {
+    addError('Connection failed. Check your API key or network.');
+  }
+
+  setLoading(false);
+}
+
+function renderMessages() {
+  const container = document.getElementById('messages');
+  container.innerHTML = '';
+
+  if (messages.length === 0) {
+    container.innerHTML = `
+      <div class="welcome-msg">
+        <div class="w-icon">◎</div>
+        <p>Your companion is waiting.<br>Say something.</p>
+      </div>`;
+    return;
+  }
+
+  messages.forEach(msg => {
+    const el = document.createElement('div');
+    el.className = `msg ${msg.role}`;
+
+    if (msg.role === 'assistant') {
+      el.innerHTML = `<div class="msg-name">${companionName}</div><div class="msg-body">${escapeHtml(msg.content)}</div>`;
+    } else if (msg.role === 'system-note') {
+      el.className = 'error-msg';
+      el.textContent = msg.content;
+    } else {
+      el.innerHTML = `<div class="msg-body">${escapeHtml(msg.content)}</div>`;
+    }
+
+    container.appendChild(el);
+  });
+
+  container.scrollTop = container.scrollHeight;
+}
+
+function addSystemMessage(text) {
+  messages.push({ role: 'system-note', content: text });
+  renderMessages();
+}
+
+function addError(text) {
+  const container = document.getElementById('messages');
+  const el = document.createElement('div');
+  el.className = 'error-msg';
+  el.textContent = `⚠ ${text}`;
+  container.appendChild(el);
+  container.scrollTop = container.scrollHeight;
+}
+
+function setLoading(state) {
+  isLoading = state;
+  document.getElementById('send-btn').disabled = state;
+  document.getElementById('typing').className = state ? 'typing-indicator visible' : 'typing-indicator';
+  if (state) {
+    const container = document.getElementById('messages');
+    container.appendChild(document.getElementById('typing'));
+    container.scrollTop = container.scrollHeight;
+  }
+}
+
+function escapeHtml(str) {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/\n/g, '<br>');
+}
+</script>
+</body>
+</html>
