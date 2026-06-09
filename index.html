@@ -785,11 +785,16 @@ function addError(text) {
 function setLoading(state) {
   isLoading = state;
   document.getElementById('send-btn').disabled = state;
-  document.getElementById('typing').className = state ? 'typing-indicator visible' : 'typing-indicator';
+  const typingEl = document.getElementById('typing');
+  const container = document.getElementById('messages');
   if (state) {
-    const container = document.getElementById('messages');
-    container.appendChild(document.getElementById('typing'));
+    typingEl.className = 'typing-indicator visible';
+    container.appendChild(typingEl);
     container.scrollTop = container.scrollHeight;
+  } else {
+    typingEl.className = 'typing-indicator';
+    // move typing indicator back outside messages so renderMessages doesn't destroy it
+    document.body.appendChild(typingEl);
   }
 }
 
